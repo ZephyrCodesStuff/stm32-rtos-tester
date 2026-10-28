@@ -1,7 +1,7 @@
 /*
 
     ###################################
-    # Laboratory: USART Calculator
+    # Laboratory: UART Calculator
     # Author: [zeph](https://github.com/ZephyrCodesStuff)
     ###################################
 

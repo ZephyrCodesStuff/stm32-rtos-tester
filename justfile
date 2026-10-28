@@ -158,9 +158,14 @@ clean target="all":
 # Clean and rebuild from scratch
 rebuild target=target build_type=build_type cmsis=cmsis: (clean target) (build target build_type cmsis)
 
-# Run Renode automated tests (Robot Framework)
-test target=target build_type=build_type cmsis=cmsis: (build target build_type cmsis)
+# Run Renode automated tests (Robot Framework, STM32F401RE only)
+test target="f401" build_type=build_type cmsis=cmsis: (build target build_type cmsis)
     #!/usr/bin/env bash
     set -euo pipefail
+    BOARD=$(./scripts/resolve-board.sh "{{target}}")
+    if [ "$BOARD" != "STM32F401RE" ]; then
+        echo "Error: Renode emulation tests are currently only supported for STM32F401RE (platform definition not available for ${BOARD})." >&2
+        exit 1
+    fi
     renode-test test/calculator.robot
 

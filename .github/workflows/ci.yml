@@ -13,8 +13,12 @@ concurrency:
 
 jobs:
   build:
-    name: Build (All Boards)
+    name: Build (${{ matrix.board }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        board: [f401, g491]
 
     steps:
       - name: Checkout Code
@@ -53,16 +57,18 @@ jobs:
             echo "$tool_bin" >> $GITHUB_PATH
           done
 
-      - name: Build All Supported Boards
+      - name: Build Firmware
         run: |
-          for board_dir in boards/*/; do
-            board=$(basename "$board_dir")
-            echo "=========================================="
-            echo "Building Board: $board (Debug)"
-            echo "=========================================="
-            just target=$board build_type=Debug build
-            just target=$board size
-          done
+          just target=${{ matrix.board }} build_type=Debug build
+          just target=${{ matrix.board }} size
+
+      - name: Upload F401 Firmware Binary for Emulation
+        if: matrix.board == 'f401'
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-f401
+          path: build/STM32F401RE-Debug/lab-calculator.elf
+          if-no-files-found: error
 
   lint:
     name: Lint (All Boards)
@@ -114,3 +120,56 @@ jobs:
             echo "=========================================="
             just target=$board build_type=Debug lint
           done
+
+  test:
+    name: Renode Emulation Tests (STM32F401RE)
+    needs: build
+    runs-on: ubuntu-latest
+    # Renode emulation is scoped to STM32F401RE (platform description stm32f4.repl is not available for G4)
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download F401 Firmware Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-f401
+          path: build/STM32F401RE-Debug
+
+      - name: Cache Renode Installation
+        id: cache-renode
+        uses: actions/cache@v4
+        with:
+          path: ~/.renode
+          key: renode-linux-portable-v1
+
+      - name: Install Renode & Robot Framework
+        run: |
+          if [ ! -f "$HOME/.renode/renode-test" ]; then
+            mkdir -p "$HOME/.renode"
+            wget --progress=dot:giga https://builds.renode.io/renode-latest.linux-portable.tar.gz
+            tar -xzf renode-latest.linux-portable.tar.gz -C "$HOME/.renode" --strip-components=1
+            rm -f renode-latest.linux-portable.tar.gz
+          fi
+          echo "$HOME/.renode" >> $GITHUB_PATH
+          pip install -r "$HOME/.renode/tests/requirements.txt"
+
+      - name: Run Renode Emulation Tests
+        run: |
+          renode-test test/calculator.robot
+
+      - name: Upload Renode Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: renode-test-report
+          path: |
+            report.html
+            log.html
+            robot_output.xml
