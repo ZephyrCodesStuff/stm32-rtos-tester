@@ -7,3 +7,5 @@
 build
 mx.scratch
 !.settings
+
+test/*.bin
