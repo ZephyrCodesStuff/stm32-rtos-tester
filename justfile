@@ -104,7 +104,7 @@ reset target=target build_type=build_type:
 size target=target build_type=build_type:
     #!/usr/bin/env bash
     BOARD=$(./scripts/resolve-board.sh "{{target}}")
-    ELF="build/${BOARD}-{{build_type}}/sandbox.elf"
+    ELF="build/${BOARD}-{{build_type}}/lab-calculator.elf"
     if [ ! -f "$ELF" ]; then
         echo "Binary not found at $ELF. Run 'just target={{target}} build' first."
         exit 1
@@ -119,16 +119,26 @@ size target=target build_type=build_type:
         size "$ELF"
     fi
 
-# Run clang-tidy static analysis on application source files
-lint target=target build_type=build_type:
+# Run clang-tidy static analysis on application source files, auto-configuring if needed
+lint target=target build_type=build_type cmsis=cmsis:
     #!/usr/bin/env bash
     set -euo pipefail
     BOARD=$(./scripts/resolve-board.sh "{{target}}")
     BUILD_DIR="build/${BOARD}-{{build_type}}"
+    ENABLE_CMSIS="{{if cmsis == "true" { "ON" } else { "OFF" }}}"
+    CACHE="${BUILD_DIR}/CMakeCache.txt"
     if ! command -v clang-tidy >/dev/null 2>&1; then
         echo "Error: clang-tidy is required for linting but was not found." >&2
         exit 1
     fi
+    if [ ! -f "${BUILD_DIR}/compile_commands.json" ] || ! grep -q "ENABLE_CMSIS_OS2:BOOL=${ENABLE_CMSIS}" "$CACHE" 2>/dev/null; then
+        echo "Configuring ${BOARD} ({{build_type}})..."
+        cmake -B "${BUILD_DIR}" -G Ninja \
+            -DCMAKE_BUILD_TYPE="{{build_type}}" \
+            -DTARGET_BOARD="${BOARD}" \
+            -DENABLE_CMSIS_OS2="${ENABLE_CMSIS}"
+    fi
+    ln -sfn "${BOARD}-{{build_type}}/compile_commands.json" "build/compile_commands.json" 2>/dev/null || true
     FILES=$(find Src -name "*.c" ! -name "sys*.c")
     echo "Running static analysis on: $FILES (${BOARD})"
     clang-tidy $FILES -p "$BUILD_DIR" --extra-arg=--sysroot=/dummy --quiet --warnings-as-errors='*'
@@ -147,3 +157,10 @@ clean target="all":
 
 # Clean and rebuild from scratch
 rebuild target=target build_type=build_type cmsis=cmsis: (clean target) (build target build_type cmsis)
+
+# Run Renode automated tests (Robot Framework)
+test target=target build_type=build_type cmsis=cmsis: (build target build_type cmsis)
+    #!/usr/bin/env bash
+    set -euo pipefail
+    renode-test test/calculator.robot
+

@@ -1,10 +1,10 @@
 {
-  "name": "sandbox",
+  "name": "lab-calculator",
   "configurations": [
     {
       "name": "Debug",
       "type": "Executable",
-      "output_filename": "sandbox",
+      "output_filename": "lab-calculator",
       "mcu": "STM32F401RET6",
       "board": "NUCLEO-F401RE",
       "toolchain_type": "CLANG",
@@ -85,7 +85,7 @@
           "type": "cpp_linker",
           "flags": [
             "-Tstm32f401xe_flash.ld",
-            "-Wl,-Map=sandbox.map",
+            "-Wl,-Map=lab-calculator.map",
             "-Wl,--start-group",
             "-lc",
             "-lm",
@@ -104,7 +104,7 @@
     {
       "name": "Release",
       "type": "Executable",
-      "output_filename": "sandbox",
+      "output_filename": "lab-calculator",
       "mcu": "STM32F401RET6",
       "board": "NUCLEO-F401RE",
       "toolchain_type": "CLANG",
@@ -176,7 +176,7 @@
           "type": "cpp_linker",
           "flags": [
             "-Tstm32f401xe_flash.ld",
-            "-Wl,-Map=sandbox.map",
+            "-Wl,-Map=lab-calculator.map",
             "-Wl,--start-group",
             "-lc",
             "-lm",

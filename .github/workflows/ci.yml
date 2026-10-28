@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-lint:
-    name: Build & Lint (All Boards)
+  build:
+    name: Build (All Boards)
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,7 @@ jobs:
       - name: Install System Utilities
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build clang-tidy
+          sudo apt-get install -y cmake ninja-build
 
       - name: Setup Just
         uses: extractions/setup-just@v2
@@ -62,6 +62,47 @@ jobs:
             echo "=========================================="
             just target=$board build_type=Debug build
             just target=$board size
+          done
+
+  lint:
+    name: Lint (All Boards)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install System Utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang-tidy
+
+      - name: Setup Just
+        uses: extractions/setup-just@v2
+
+      - name: Cache STM32Cube Toolchain Bundles
+        id: cache-stm32cube
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/stm32cube
+            ~/.stm32cube
+            ~/.local/share/stm32cube
+          key: stm32cube-bundles-${{ runner.os }}-${{ hashFiles('.settings/bundles-lock.store.json') }}
+          restore-keys: |
+            stm32cube-bundles-${{ runner.os }}-
+
+      - name: Install STM32CubeCLI and Toolchain Bundles
+        run: |
+          curl -fsSL https://developer.st.com/bundles/install/install.sh | bash -
+          export PATH="$HOME/.local/stm32cube/bin:$PATH"
+          echo "$HOME/.local/stm32cube/bin" >> $GITHUB_PATH
+
+          cube bundle install --project --yes
+
+          # Dynamically export discovered toolchain paths (no hardcoded versions)
+          for tool_bin in $(find "$HOME/.local/stm32cube" "$HOME/.stm32cube" "$HOME/.local/share/stm32cube" -type d -name "bin" 2>/dev/null); do
+            echo "$tool_bin" >> $GITHUB_PATH
           done
 
       - name: Run Clang-Tidy Static Analysis (User Code Only)

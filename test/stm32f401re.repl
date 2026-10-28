@@ -1,0 +1,7 @@
+using "platforms/cpus/stm32f4.repl"
+
+// User LED on GPIO port A pin 5
+led: Miscellaneous.LED @ gpioPortA
+
+gpioPortA:
+    5 -> led@0

@@ -34,11 +34,13 @@ set(HAL_SOURCES
     ${cmsis_device_SOURCE_DIR}/Source/Templates/system_stm32${MCU_FAMILY}xx.c
     ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal.c
     ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_cortex.c
-    ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_rcc.c
-    ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_rcc_ex.c
+    ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_dma.c
+    ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_gpio.c
     ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_pwr.c
     ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_pwr_ex.c
-    ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_gpio.c
+    ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_rcc.c
+    ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_rcc_ex.c
+    ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_uart.c
 )
 
 # 4. Create the unified HAL library

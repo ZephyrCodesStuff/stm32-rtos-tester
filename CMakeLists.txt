@@ -70,12 +70,12 @@ endif()
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/starm-clang.cmake)
 
 # Project definition
-project(sandbox)
+project(lab-calculator)
 
 # Enable CMake support for ASM and C/CPP languages
 enable_language(C CXX ASM)
 
-set(PROJECT_NAME sandbox)
+set(PROJECT_NAME lab-calculator)
 
 # Create an executable object type
 add_executable(${PROJECT_NAME})

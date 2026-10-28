@@ -111,7 +111,7 @@ target_link_options(${PROJECT_NAME} PUBLIC
     # Linker flags specific to Debug build type
     $<$<CONFIG:Debug>: 
         -T${CMAKE_CURRENT_BINARY_DIR}/flash.ld
-        -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/sandbox.map
+        -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/lab-calculator.map
         -Wl,--start-group
         -lc
         -lm
@@ -128,7 +128,7 @@ target_link_options(${PROJECT_NAME} PUBLIC
     # Linker flags specific to Release build type
     $<$<CONFIG:Release>: 
         -T${CMAKE_CURRENT_BINARY_DIR}/flash.ld
-        -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/sandbox.map
+        -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/lab-calculator.map
         -Wl,--start-group
         -lc
         -lm

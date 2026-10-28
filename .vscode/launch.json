@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "renodegdb",
+            "request": "launch",
+            "name": "Debug in Renode",
+            "elf": "${workspaceFolder}/build/STM32F401RE-Release/lab-calculator.elf",
+            "gdb": "lldb",
+            "resc": "${workspaceFolder}/test/test.resc",
+            "cwd": "${workspaceFolder}",
+            "terminals": [
+                "ws://127.0.0.1:21234/monitor", // Monitor
+                "ws://127.0.0.1:21234/logs" // Log
+            ]
+        }
+    ]
+}
