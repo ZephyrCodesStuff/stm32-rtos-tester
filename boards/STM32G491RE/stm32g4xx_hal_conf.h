@@ -20,6 +20,7 @@
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
+#define HAL_UART_MODULE_ENABLED
 #define HAL_EXTI_MODULE_ENABLED
 
 /* ########################## Oscillator Values ############################# */
@@ -86,6 +87,10 @@
 
 #ifdef HAL_PWR_MODULE_ENABLED
   #include "stm32g4xx_hal_pwr.h"
+#endif
+
+#ifdef HAL_UART_MODULE_ENABLED
+  #include "stm32g4xx_hal_uart.h"
 #endif
 
 #ifdef HAL_EXTI_MODULE_ENABLED

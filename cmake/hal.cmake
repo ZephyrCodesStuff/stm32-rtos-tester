@@ -43,6 +43,16 @@ set(HAL_SOURCES
     ${hal_driver_SOURCE_DIR}/Src/stm32${MCU_FAMILY}xx_hal_uart.c
 )
 
+# Optional family-specific extension sources (e.g. UART_Ex on G4/L4, DMA_Ex on F4/G4)
+foreach(OPT_SRC
+    stm32${MCU_FAMILY}xx_hal_uart_ex.c
+    stm32${MCU_FAMILY}xx_hal_dma_ex.c
+)
+    if(EXISTS "${hal_driver_SOURCE_DIR}/Src/${OPT_SRC}")
+        list(APPEND HAL_SOURCES "${hal_driver_SOURCE_DIR}/Src/${OPT_SRC}")
+    endif()
+endforeach()
+
 # 4. Create the unified HAL library
 add_library(stm32_hal STATIC
     ${HAL_SOURCES}
